@@ -55,9 +55,9 @@ public class EventControllerTest {
 
         // given
         mockMvc.perform(post("/api/events")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .accept(MediaTypes.HAL_JSON)
-                    .content(objectMapper.writeValueAsString(event)))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
@@ -67,7 +67,10 @@ public class EventControllerTest {
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
-            ;
+                .andExpect(jsonPath("_links .self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists())
+        ;
     }
 
     @TestDescription("입력 받을 수 없는 값을 사용한 경우에 에러가 발생하는 테스트")
