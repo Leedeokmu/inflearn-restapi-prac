@@ -22,7 +22,11 @@ import project.restapi.demoprojectforrestapi.events.EventStatus;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -76,7 +80,52 @@ public class EventControllerTest {
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update-event").exists())
-                .andDo(document("create-event"))
+                .andDo(document("create-event",
+                        links(
+                                linkWithRel("self").description("link to self"),
+                                linkWithRel("update-event").description("link to update an existing event"),
+                                linkWithRel("query-events").description("link to query events")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("name of new Event"),
+                                fieldWithPath("description").description("description of new Event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of beginEnrollmentDateTime of new Event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of closeEnrollmentDateTime of new Event"),
+                                fieldWithPath("beginEventDateTime").description("date time of beginEventDateTime of new Event"),
+                                fieldWithPath("endEventDateTime").description("date time of endEventDateTime of new Event"),
+                                fieldWithPath("location").description("location of new Event"),
+                                fieldWithPath("basePrice").description("basePrice of new Event"),
+                                fieldWithPath("maxPrice").description("maxPrice of new Event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location of newly created event url"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("HAL json content type")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("id of new Event"),
+                                fieldWithPath("name").description("name of new Event"),
+                                fieldWithPath("description").description("description of new Event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of beginEnrollmentDateTime of new Event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of closeEnrollmentDateTime of new Event"),
+                                fieldWithPath("beginEventDateTime").description("date time of beginEventDateTime of new Event"),
+                                fieldWithPath("endEventDateTime").description("date time of endEventDateTime of new Event"),
+                                fieldWithPath("location").description("location of new Event"),
+                                fieldWithPath("basePrice").description("basePrice of new Event"),
+                                fieldWithPath("maxPrice").description("maxPrice of new Event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment"),
+                                fieldWithPath("free").description("it tells if this events is free"),
+                                fieldWithPath("offline").description("it tells if this events is offline"),
+                                fieldWithPath("eventStatus").description("event status"),
+                                fieldWithPath("_links.self.href").description("link to self"),
+                                fieldWithPath("_links.update-event.href").description("link to update an existing event"),
+                                fieldWithPath("_links.query-events.href").description("link to query events")
+                        )
+                    ))
         ;
     }
 
