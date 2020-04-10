@@ -13,14 +13,12 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import project.restapi.demoprojectforrestapi.common.ErrorsResource;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -60,13 +58,30 @@ public class EventController {
     }
 
     @GetMapping
-    ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
 
         Page<Event> events = this.eventRepository.findAll(pageable);
         PagedResources<Resource<Event>> resources = assembler.toResource(events, e -> new EventResource(e));
         resources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
         return ResponseEntity.ok().body(resources);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getEvent(@PathVariable("id") Integer id) {
+        Optional<Event> optionalEvent = eventRepository.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Event foundEvent = optionalEvent.get();
+        EventResource eventResource = new EventResource(foundEvent);
+        eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+        return ResponseEntity.ok().body(eventResource);
+
+
+    }
+
+
+
 
     private ResponseEntity badRequest(Errors errors) {
         return ResponseEntity.badRequest().body(new ErrorsResource(errors));
