@@ -2,12 +2,18 @@ package project.restapi.demoprojectforrestapi.events;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +57,15 @@ public class EventController {
         eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
         return ResponseEntity.created(uri).body(eventResource);
 
+    }
+
+    @GetMapping
+    ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+
+        Page<Event> events = this.eventRepository.findAll(pageable);
+        PagedResources<Resource<Event>> resources = assembler.toResource(events, e -> new EventResource(e));
+        resources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
+        return ResponseEntity.ok().body(resources);
     }
 
     private ResponseEntity badRequest(Errors errors) {
