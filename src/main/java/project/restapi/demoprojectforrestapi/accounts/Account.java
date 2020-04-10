@@ -1,6 +1,7 @@
 package project.restapi.demoprojectforrestapi.accounts;
 
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 import project.restapi.demoprojectforrestapi.events.Event;
 
 import javax.persistence.*;
@@ -16,11 +17,14 @@ public class Account {
     @Id @GeneratedValue
     @Column(name = "ACCOUNT_ID")
     private Integer id;
+
+    @Column(unique = true)
     private String email;
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "ACCOUNT_ROLES", joinColumns = @JoinColumn(name = "ACCOUNT_ID"))
     private Set<AccountRole> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "account")

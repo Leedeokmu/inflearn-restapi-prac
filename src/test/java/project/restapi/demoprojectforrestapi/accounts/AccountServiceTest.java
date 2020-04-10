@@ -10,13 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 
 @RunWith(SpringRunner.class)
@@ -29,6 +29,8 @@ public class AccountServiceTest {
     AccountService accountService;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Test
     public void findByUsername () {
@@ -41,13 +43,13 @@ public class AccountServiceTest {
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
 
-        Account saveAccount = accountRepository.save(account);
+        this.accountService.saveAccount(account);
         // when
         UserDetailsService userDetailsService = accountService;
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         // then
-        assertThat(userDetails.getPassword()).isEqualTo(password);
+        assertThat(this.passwordEncoder.matches(password, userDetails.getPassword())).isTrue();
     }
 
     @Test
