@@ -11,9 +11,6 @@ public class DemoProjectForRestapiApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoProjectForRestapiApplication.class, args);
     }
-    @Bean
-    public ModelMapper modelMapper () {
-        return new ModelMapper();
-    }
+
 
 }
