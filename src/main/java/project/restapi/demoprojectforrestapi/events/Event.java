@@ -1,8 +1,10 @@
 package project.restapi.demoprojectforrestapi.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import org.springframework.util.StringUtils;
 import project.restapi.demoprojectforrestapi.accounts.Account;
+import project.restapi.demoprojectforrestapi.accounts.AccountSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,6 +35,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACCOUNT_ID")
+    @JsonSerialize(using = AccountSerializer.class)
     private Account manager;
 
     public void update() {

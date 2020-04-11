@@ -51,7 +51,6 @@ public class EventController {
 
         Event event = modelMapper.map(eventDto, Event.class);
         event.setManager(account);
-
         event.update();
 
         Event newEvent = eventRepository.save(event);

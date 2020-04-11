@@ -27,6 +27,6 @@ public class Account {
     @CollectionTable(name = "ACCOUNT_ROLES", joinColumns = @JoinColumn(name = "ACCOUNT_ID"))
     private Set<AccountRole> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "manager")
     private List<Event> events = new ArrayList<>();
 }

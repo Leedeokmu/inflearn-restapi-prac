@@ -3,14 +3,10 @@ package project.restapi.demoprojectforrestapi.config;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import project.restapi.demoprojectforrestapi.accounts.Account;
-import project.restapi.demoprojectforrestapi.accounts.AccountRole;
 import project.restapi.demoprojectforrestapi.accounts.AccountService;
 import project.restapi.demoprojectforrestapi.common.AppProperties;
 import project.restapi.demoprojectforrestapi.common.BaseControllerTest;
 import project.restapi.demoprojectforrestapi.common.TestDescription;
-
-import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
