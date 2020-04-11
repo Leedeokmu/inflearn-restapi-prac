@@ -7,20 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import project.restapi.demoprojectforrestapi.accounts.Account;
-import project.restapi.demoprojectforrestapi.accounts.AccountAdapter;
 import project.restapi.demoprojectforrestapi.accounts.CurrentUser;
 import project.restapi.demoprojectforrestapi.common.ErrorsResource;
 
@@ -28,11 +22,10 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Controller
-@RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
+@RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
 @RequiredArgsConstructor
 public class EventController {
     private final EventRepository eventRepository;
@@ -54,7 +47,7 @@ public class EventController {
         event.update();
 
         Event newEvent = eventRepository.save(event);
-        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI uri = selfLinkBuilder.toUri();
         event.setId(10);
 
@@ -73,12 +66,12 @@ public class EventController {
             , @CurrentUser Account account
     ) {
         Page<Event> events = this.eventRepository.findAll(pageable);
-        PagedResources<Resource<Event>> resources = assembler.toResource(events, e -> new EventResource(e));
-        resources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
+        PagedModel<EventResource> eventResources = assembler.toModel(events, e -> new EventResource(e));
+        eventResources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
         if(account != null){
-            resources.add(linkTo(EventController.class).withRel("create-event"));
+            eventResources.add(linkTo(EventController.class).withRel("create-event"));
         }
-        return ResponseEntity.ok().body(resources);
+        return ResponseEntity.ok().body(eventResources);
     }
 
     @GetMapping("/{id}")
