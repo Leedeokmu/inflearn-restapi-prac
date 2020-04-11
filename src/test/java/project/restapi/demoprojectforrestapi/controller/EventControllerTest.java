@@ -258,6 +258,26 @@ public class EventControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @TestDescription("30개의 이벤트를 10개씩 두번째 페이지 조회하기 with 인증 정보가 있을 때 이벤트 생성 링크가 있어야 함")
+    public void queryEventsWithAuthentication () throws Exception {
+        // given
+        IntStream.range(0,30).forEach(i -> {
+            this.generateEvent(i);
+        });
+
+        // when
+        this.mockMvc.perform(get("/api/events")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "name,DESC")
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_links.create-event").exists())
+        ;
+    }
+
+    @Test
     @TestDescription("기존의 이벤트를 하나 조회하기")
     public void getEvent () throws Exception {
         // given
