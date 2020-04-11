@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import project.restapi.demoprojectforrestapi.accounts.Account;
 import project.restapi.demoprojectforrestapi.accounts.AccountRole;
 import project.restapi.demoprojectforrestapi.accounts.AccountService;
+import project.restapi.demoprojectforrestapi.common.AppProperties;
 import project.restapi.demoprojectforrestapi.common.BaseControllerTest;
 import project.restapi.demoprojectforrestapi.common.TestDescription;
 
@@ -19,27 +20,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthServerConfigTest extends BaseControllerTest {
     @Autowired
     AccountService accountService;
+    @Autowired
+    AppProperties appProperties;
 
     @Test
     @TestDescription("인증 토큰을 발급 받는 테스트")
     public void getAuthToken () throws Exception {
-        //given
-        String username = "deokmuTest@email.com";
-        String password = "deokmu";
-        Account deokmu = Account.builder()
-                .email(username)
-                .password(password)
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .build();
-        this.accountService.saveAccount(deokmu);
-
-        String clientId = "myApp";
-        String clientSecret = "pass";
-        // when
+        // when & then
         this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret))
-                .param("username", username)
-                .param("password", password)
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword())
                 .param("grant_type", "password")
         )
                 .andDo(print())
@@ -50,9 +41,6 @@ public class AuthServerConfigTest extends BaseControllerTest {
                 .andExpect(jsonPath("token_type").value("bearer"))
                 .andExpect(jsonPath("expires_in").isNumber())
         ;
-
-
-        // then
     }
 
 }

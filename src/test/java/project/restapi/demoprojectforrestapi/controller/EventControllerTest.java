@@ -12,6 +12,7 @@ import project.restapi.demoprojectforrestapi.accounts.Account;
 import project.restapi.demoprojectforrestapi.accounts.AccountRepository;
 import project.restapi.demoprojectforrestapi.accounts.AccountRole;
 import project.restapi.demoprojectforrestapi.accounts.AccountService;
+import project.restapi.demoprojectforrestapi.common.AppProperties;
 import project.restapi.demoprojectforrestapi.common.BaseControllerTest;
 import project.restapi.demoprojectforrestapi.common.TestDescription;
 import project.restapi.demoprojectforrestapi.events.Event;
@@ -40,6 +41,8 @@ public class EventControllerTest extends BaseControllerTest {
     AccountService accountService;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    AppProperties appProperties;
 
     @Before
     public void init() {
@@ -133,22 +136,18 @@ public class EventControllerTest extends BaseControllerTest {
     }
 
     private String getAccessToken() throws Exception {
-        String username = "deokmuTest@email.com";
-        String password = "deokmu";
-        Account deokmu = Account.builder()
-                .email(username)
-                .password(password)
+        Account account = Account.builder()
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserPassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
-        this.accountService.saveAccount(deokmu);
+        this.accountService.saveAccount(account);
 
-        String clientId = "myApp";
-        String clientSecret = "pass";
         // when
         String responseBody = this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret))
-                .param("username", username)
-                .param("password", password)
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword())
                 .param("grant_type", "password")
         ).andReturn().getResponse().getContentAsString();
         Jackson2JsonParser parser = new Jackson2JsonParser();
